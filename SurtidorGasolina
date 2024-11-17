@@ -1,0 +1,190 @@
+import javax.swing.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
+public class SurtidorGasolina extends JFrame {
+
+    // Declaración de componentes
+    private JTextField txtGalonesActuales;
+    private JTextField txtDinero;
+    private JTextField txtGalonesIngresar;
+    private JRadioButton rbtnDinero;
+    private JRadioButton rbtnGalones;
+    private JButton btnLlenarTanque;
+    private JButton btnIniciarLlenado;
+    private JComboBox<String> comboFormaPago;
+    private JLabel lblProgresoGasolina;
+    private JLabel lblValorAPagar;
+    private JTextArea txtFactura;
+
+    // Variables del surtidor
+    private final double PRECIO_POR_GALON = 15540.0;
+    private double capacidadTotal = 10; // Capacidad máxima del tanque
+    private double gasolinaActual = 0; // Gasolina que ya tiene el vehículo
+    private double montoSeleccionado = 0; // Monto o cantidad seleccionada
+
+    public SurtidorGasolina() {
+        // Configuración del JFrame
+        setTitle("Surtidor de Gasolina");
+        setSize(600, 700);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setLayout(null); // Diseño manual
+
+        // Componentes de la interfaz
+        JLabel lblGalonesActuales = new JLabel("Galones actuales:");
+        lblGalonesActuales.setBounds(30, 30, 150, 25);
+        add(lblGalonesActuales);
+
+        txtGalonesActuales = new JTextField();
+        txtGalonesActuales.setBounds(180, 30, 150, 25);
+        add(txtGalonesActuales);
+
+        rbtnDinero = new JRadioButton("Ingresar por dinero");
+        rbtnDinero.setBounds(30, 70, 150, 25);
+        add(rbtnDinero);
+
+        txtDinero = new JTextField();
+        txtDinero.setBounds(180, 70, 150, 25);
+        txtDinero.setEnabled(false);
+        add(txtDinero);
+
+        rbtnGalones = new JRadioButton("Ingresar por galones");
+        rbtnGalones.setBounds(30, 110, 150, 25);
+        add(rbtnGalones);
+
+        txtGalonesIngresar = new JTextField();
+        txtGalonesIngresar.setBounds(180, 110, 150, 25);
+        txtGalonesIngresar.setEnabled(false);
+        add(txtGalonesIngresar);
+
+        ButtonGroup bgOpciones = new ButtonGroup();
+        bgOpciones.add(rbtnDinero);
+        bgOpciones.add(rbtnGalones);
+
+        btnLlenarTanque = new JButton("Llenar tanque");
+        btnLlenarTanque.setBounds(30, 150, 150, 25);
+        add(btnLlenarTanque);
+
+        JLabel lblFormaPago = new JLabel("Forma de pago:");
+        lblFormaPago.setBounds(30, 190, 150, 25);
+        add(lblFormaPago);
+
+        comboFormaPago = new JComboBox<>(new String[]{"Efectivo", "Tarjeta"});
+        comboFormaPago.setBounds(180, 190, 150, 25);
+        add(comboFormaPago);
+
+        btnIniciarLlenado = new JButton("Iniciar llenado");
+        btnIniciarLlenado.setBounds(30, 230, 300, 25);
+        btnIniciarLlenado.setEnabled(false);
+        add(btnIniciarLlenado);
+
+        lblProgresoGasolina = new JLabel("Progreso de gasolina: 0 galones");
+        lblProgresoGasolina.setBounds(30, 270, 300, 25);
+        add(lblProgresoGasolina);
+
+        lblValorAPagar = new JLabel("Valor a pagar: $0.00");
+        lblValorAPagar.setBounds(30, 310, 300, 25);
+        add(lblValorAPagar);
+
+        txtFactura = new JTextArea("Factura:\nN/A");
+        txtFactura.setBounds(30, 350, 500, 250);
+        txtFactura.setEditable(false);
+        txtFactura.setLineWrap(true);
+        txtFactura.setWrapStyleWord(true);
+        add(txtFactura);
+
+        // Eventos
+        rbtnDinero.addActionListener(e -> {
+            txtDinero.setEnabled(true);
+            txtGalonesIngresar.setEnabled(false);
+            txtGalonesIngresar.setText("");
+            validarCampos();
+        });
+
+        rbtnGalones.addActionListener(e -> {
+            txtDinero.setEnabled(false);
+            txtGalonesIngresar.setEnabled(true);
+            txtDinero.setText("");
+            validarCampos();
+        });
+
+        txtGalonesActuales.addCaretListener(e -> validarCampos());
+        txtDinero.addCaretListener(e -> validarCampos());
+        txtGalonesIngresar.addCaretListener(e -> validarCampos());
+
+        btnLlenarTanque.addActionListener(e -> prepararLlenadoTanque());
+        btnIniciarLlenado.addActionListener(e -> iniciarLlenado());
+
+        // Mostrar ventana
+        setVisible(true);
+    }
+
+    // Método para validar que los campos estén llenos y sean correctos
+    private void validarCampos() {
+        try {
+            gasolinaActual = Double.parseDouble(txtGalonesActuales.getText());
+            if (gasolinaActual < 0 || gasolinaActual > capacidadTotal) {
+                btnIniciarLlenado.setEnabled(false);
+                return;
+            }
+
+            if (rbtnDinero.isSelected()) {
+                montoSeleccionado = Double.parseDouble(txtDinero.getText());
+                btnIniciarLlenado.setEnabled(montoSeleccionado > 0);
+            } else if (rbtnGalones.isSelected()) {
+                double galones = Double.parseDouble(txtGalonesIngresar.getText());
+                btnIniciarLlenado.setEnabled(galones > 0);
+            }
+        } catch (NumberFormatException ex) {
+            btnIniciarLlenado.setEnabled(false);
+        }
+    }
+
+    // Método para preparar el llenado del tanque
+    private void prepararLlenadoTanque() {
+        double espacioDisponible = capacidadTotal - gasolinaActual;
+        if (espacioDisponible <= 0) {
+            JOptionPane.showMessageDialog(this, "El tanque ya está lleno.");
+        } else {
+            JOptionPane.showMessageDialog(this, "El tanque está listo para llenarse.");
+        }
+    }
+
+    // Método para iniciar el llenado
+    private void iniciarLlenado() {
+        double galonesParaIngresar = 0;
+        if (rbtnDinero.isSelected()) {
+            galonesParaIngresar = montoSeleccionado / PRECIO_POR_GALON;
+        } else if (rbtnGalones.isSelected()) {
+            galonesParaIngresar = Double.parseDouble(txtGalonesIngresar.getText());
+        }
+
+        double espacioDisponible = capacidadTotal - gasolinaActual;
+        if (galonesParaIngresar > espacioDisponible) {
+            galonesParaIngresar = espacioDisponible;
+        }
+
+        gasolinaActual += galonesParaIngresar;
+        double costoTotal = galonesParaIngresar * PRECIO_POR_GALON;
+        lblProgresoGasolina.setText(String.format("Progreso de gasolina: %.2f galones", gasolinaActual));
+        lblValorAPagar.setText(String.format("Valor a pagar: $%.2f", costoTotal));
+
+        String factura = generarFactura(galonesParaIngresar, costoTotal);
+        txtFactura.setText(factura);
+    }
+
+    private String generarFactura(double galones, double costo) {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        String fecha = sdf.format(new Date());
+        return String.format(
+                "Factura:\nFecha: %s\nGalones ingresados: %.2f\nCosto: $%.2f",
+                fecha, galones, costo
+        );
+    }
+
+    public static void main(String[] args) {
+        new SurtidorGasolina();
+    }
+}
