@@ -1,0 +1,72 @@
+public class MiFormulario extends javax.swing.JFrame {
+
+    // Declaración de componentes
+    private javax.swing.JButton btnAlternativa;
+    private javax.swing.JTextField txtCampoDinero;
+    private javax.swing.JLabel lblIndicacion;
+    
+    public MiFormulario() {
+        initComponents();
+    }
+
+    private void initComponents() {
+        // Inicialización de los componentes
+        btnAlternativa = new javax.swing.JButton();
+        txtCampoDinero = new javax.swing.JTextField();
+        lblIndicacion = new javax.swing.JLabel();
+        
+        // Configuración de la etiqueta
+        lblIndicacion.setText("Ingresa una cantidad o usa el botón para desactivarlo:");
+
+        // Configuración del botón alternativo
+        btnAlternativa.setText("Alternativa");
+        btnAlternativa.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnAlternativaActionPerformed(evt);
+            }
+        });
+
+        // Configuración del campo de texto
+        txtCampoDinero.setText("0"); // Valor predeterminado
+        txtCampoDinero.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusLost(java.awt.event.FocusEvent evt) {
+                // Opcional: Validar que se ingrese un valor numérico válido
+                try {
+                    Double.parseDouble(txtCampoDinero.getText());
+                } catch (NumberFormatException ex) {
+                    JOptionPane.showMessageDialog(null, "Por favor, ingresa un valor numérico.");
+                }
+            }
+        });
+
+        // Layout para organizar los componentes
+        setLayout(new java.awt.FlowLayout());
+        add(lblIndicacion);
+        add(txtCampoDinero);
+        add(btnAlternativa);
+
+        // Configuración de la ventana
+        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setTitle("Formulario de Ejemplo");
+        setSize(300, 150);
+        setLocationRelativeTo(null); // Centrar la ventana
+    }
+
+    // Método para manejar el evento del botón alternativo
+    private void btnAlternativaActionPerformed(java.awt.event.ActionEvent evt) {
+        // Desactivar el campo de texto
+        txtCampoDinero.setEnabled(false);
+        
+        // Opcional: Cambiar el texto del botón o hacer alguna otra acción
+        btnAlternativa.setText("Campo Desactivado");
+    }
+
+    public static void main(String args[]) {
+        // Ejecutar la aplicación
+        java.awt.EventQueue.invokeLater(new Runnable() {
+            public void run() {
+                new MiFormulario().setVisible(true);
+            }
+        });
+    }
+}
