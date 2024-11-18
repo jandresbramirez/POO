@@ -1,0 +1,69 @@
+ESTA ES LA CLASE QUE INTERVIENE EN FORMULARIO / CLASE NORMAL DE JAVA
+
+/*
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
+ */
+package formulario;
+
+import javax.swing.*;
+import java.awt.*;
+
+public class VentanaProgreso extends JFrame {
+    private JProgressBar barraProgreso;
+    private JLabel lblGalones;
+    private JLabel lblCosto;
+
+    // Capacidad máxima del tanque, necesaria para calcular el progreso
+    private double capacidadMaxima;
+
+    public VentanaProgreso(double capacidadMaxima) {
+        this.capacidadMaxima = capacidadMaxima;
+
+        setTitle("Progreso del Llenado de Gasolina");
+        setSize(400, 200);
+        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        setLayout(new BorderLayout());
+
+        // Barra de progreso
+        barraProgreso = new JProgressBar(0, 100); // El rango representa el porcentaje
+        barraProgreso.setStringPainted(true);
+        barraProgreso.setFont(new Font("Arial", Font.BOLD, 14));
+        barraProgreso.setForeground(new Color(50, 205, 50)); // Color verde
+        barraProgreso.setPreferredSize(new Dimension(350, 40));
+
+        // Etiquetas para mostrar el progreso
+        lblGalones = new JLabel("Galones actuales: 0.0 galones", JLabel.CENTER);
+        lblGalones.setFont(new Font("Arial", Font.PLAIN, 14));
+
+        lblCosto = new JLabel("Costo actual: $0.00", JLabel.CENTER);
+        lblCosto.setFont(new Font("Arial", Font.PLAIN, 14));
+
+        // Agregar componentes a la ventana
+        JPanel panelCentro = new JPanel();
+        panelCentro.setLayout(new BorderLayout());
+        panelCentro.add(barraProgreso, BorderLayout.NORTH);
+        panelCentro.add(lblGalones, BorderLayout.CENTER);
+        panelCentro.add(lblCosto, BorderLayout.SOUTH);
+
+        add(panelCentro, BorderLayout.CENTER);
+
+        setVisible(true);
+    }
+
+    /**
+     * Actualiza el progreso en la barra y las etiquetas de información.
+     *
+     * @param galonesActuales Galones que se han llenado hasta el momento.
+     * @param costoActual      Costo acumulado del llenado hasta el momento.
+     */
+    public void actualizarProgreso(double galonesActuales, double costoActual) {
+        // Calcular el porcentaje de llenado basado en la capacidad máxima
+        int porcentajeProgreso = (int) ((galonesActuales / capacidadMaxima) * 100);
+        barraProgreso.setValue(Math.min(porcentajeProgreso, 100)); // Asegurar que no pase del 100%
+
+        // Actualizar etiquetas
+        lblGalones.setText(String.format("Galones actuales: %.2f galones", galonesActuales));
+        lblCosto.setText(String.format("Costo actual: $%.2f", costoActual));
+    }
+}
